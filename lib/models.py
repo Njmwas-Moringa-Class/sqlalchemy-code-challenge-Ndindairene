@@ -14,7 +14,13 @@ engine = create_engine('sqlite:///db/restaurants.db', echo=True)
 
 # class Review(Base):
 #     pass
-
+class Review(Base):
+    __tablename__ = 'reviews'
+    
+    id = Column(Integer(), primary_key=True)
+    comment = Column(String())
+    star_rating = Column(Integer())
+    
 class Restaurant(Base):
     __tablename__ = 'restaurants'
 
