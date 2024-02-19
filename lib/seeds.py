@@ -1,38 +1,77 @@
+from faker import Faker
+import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, Restaurant, Customer, Review
+from models import Review, Restaurant, Customer
+import ipdb
 
-# Connect to the database
-engine = create_engine('sqlite:///db/restaurants.db')
-Base.metadata.bind = engine
+fake = Faker()
 
-# Create a session to interact with the database
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+if __name__ == "__main__":
+    engine = create_engine("sqlite:///db/restaurant.db")
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-# Seed data for restaurants
-restaurant1 = Restaurant(name='Restaurant A', price=3)
-restaurant2 = Restaurant(name='Restaurant B', price=4)
-restaurant3 = Restaurant(name='Restaurant C', price=5)
+    # session.query(Review).delete() #clear table
+    print("before")
 
-session.add_all([restaurant1, restaurant2, restaurant3])
-session.commit()
+    
+    cust = session.get(Customer, 2)
+    rest = session.get(Restaurant,2)
+    rest2 = session.get(Restaurant, 4)
+    rev = session.get(Review, 2)
+    ipdb.set_trace()
+    
+    
+    customer = [Customer(
+        first_name= fake.first_name(),
+        last_name= fake.last_name()
+    ) for _ in range(50)]
 
-# Seed data for customers
-customer1 = Customer(first_name='John', last_name='Doe')
-customer2 = Customer(first_name='Jane', last_name='Smith')
-customer3 = Customer(first_name='Alice', last_name='Johnson')
+    restaurant = [Restaurant(
+        name= fake.name(),
+        price = random.randint(100, 3500)
+    ) for _ in range(50)]
 
-session.add_all([customer1, customer2, customer3])
-session.commit()
 
-# Seed data for reviews
-review1 = Review(star_rating=4, restaurant=restaurant1, customer=customer1)
-review2 = Review(star_rating=5, restaurant=restaurant2, customer=customer2)
-review3 = Review(star_rating=3, restaurant=restaurant3, customer=customer3)
+    review = []
+    for i in range(50):
+        review1 = Review(
+        star_rating = random.randint(1,6),
+        comment = fake.sentence(),
+        customer_id = i,
+        restaurant_id= i) 
+        review.append(review1)
+        resto = restaurant[i]
+        kastoma = customer[i]
+        #resto.restaurants.append(kastoma)
 
-session.add_all([review1, review2, review3])
-session.commit()
+    # review = [Review(
+    #     star_rating = random.randint(1,6),
+    #     comment = fake.sentence(),
+    #     customer_id = i,
+    #     restaurant_id= i        
+    # ) for i in range(50)]
+    # print("After")
 
-# Close the session
-session.close()
+    # for i in range(1, 50):
+    #     resto = restaurant[i]
+    #     kastoma = customer[i]
+    #     resto.customers.append(kastoma)
+        
+
+    # session.query(review).delete() #clear table
+    session.add_all(customer)
+    session.commit()
+
+    session.add_all(restaurant)
+    session.commit()
+
+    session.add_all(review)
+    session.commit()
+
+    print("start test")
+    review1 = session.query(Review).get(1)
+    print(review1)
+    print("Done")
+
